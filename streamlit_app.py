@@ -29,6 +29,9 @@ def load_model():
     model.load_model(MODEL_PATH)
     return model
 
+def yes_no_to_binary(value):
+    return 1 if value == "Yes" else 0
+
 def calculate_shap(model, X_train, X_test):
     # Calculate SHAP values
     explainer = shap.TreeExplainer(model)
@@ -114,7 +117,7 @@ def main():
         # Retrieving data from the user
         customerID = "6464-UIAEA"
         gender = st.selectbox("Gender:", ("Female", "Male"))
-        senior_citizen = st.number_input("SeniorCitizen (0: No, 1: Yes)", min_value=0, max_value=1, step=1)
+        senior_citizen = st.selectbox("SeniorCitizen", ("No","Yes"))
         partner = st.selectbox("Partner:", ("No", "Yes"))
         dependents = st.selectbox("Dependents:", ("No", "Yes"))
         tenure = st.number_input("TenureMonths:", min_value=0, max_value=max_tenure, step=1)
@@ -141,25 +144,25 @@ def main():
             # Convert user-entered data into a data frame
             new_customer_data = pd.DataFrame({
                 "customerID": [customerID],
-                "gender": [gender],
-                "SeniorCitizen": [senior_citizen],
-                "Partner": [partner],
-                "Dependents": [dependents],
-                "TenureMonths": [tenure],
-                "PhoneService": [phone_service],
-                "MultipleLines": [multiple_lines],
-                "InternetService": [internet_service],
-                "OnlineSecurity": [online_security],
-                "OnlineBackup": [online_backup],
-                "DeviceProtection": [device_protection],
-                "TechSupport": [tech_support],
-                "StreamingTV": [streaming_tv],
-                "StreamingMovies": [streaming_movies],
+                "Gender": [gender],
+                "Senior Citizen": [yes_no_to_binary(senior_citizen)],
+                "Partner": [yes_no_to_binary(partner)],
+                "Dependents": [yes_no_to_binary(dependents)],
+                "Tenure Months": [tenure],
+                "Phone Service": [yes_no_to_binary(phone_service)],
+                "Multiple Lines": [yes_no_to_binary(multiple_lines)],
+                "Internet Service": [internet_service],
+                "Online Security": [yes_no_to_binary(online_security)],
+                "Online Backup": [yes_no_to_binary(online_backup)],
+                "Device Protection": [yes_no_to_binary(device_protection)],
+                "Tech Support": [yes_no_to_binary(tech_support)],
+                "Streaming TV": [yes_no_to_binary(streaming_tv)],
+                "Streaming Movies": [yes_no_to_binary(streaming_movies)],
                 "Contract": [contract],
-                "PaperlessBilling": [paperless_billing],
-                "PaymentMethod": [payment_method],
-                "MonthlyCharges": [monthly_charges],
-                "TotalCharges": [total_charges]
+                "Paperless Billing": [yes_no_to_binary(paperless_billing)],
+                "Payment Method": [payment_method],
+                "Monthly Charges": [monthly_charges],
+                "Total Charges": [total_charges]
             })
 
             # Predict churn probability using the model
