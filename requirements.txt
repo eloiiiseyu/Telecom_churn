@@ -6,3 +6,4 @@ matplotlib
 pyarrow
 catboost
 joblib
+pathlib
