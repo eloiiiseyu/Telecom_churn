@@ -172,7 +172,7 @@ def main():
             })
             
             # Transform numeric features using the scaler
-            numeric_features = ["TenureMonths", "MonthlyCharges", "TotalCharges"]
+            numeric_features = ["Tenure Months", "Monthly Charges", "Total Charges"]
             scaler = load_scaler()
             new_customer_data[numeric_features] = scaler.transform(new_customer_data[numeric_features])
             
