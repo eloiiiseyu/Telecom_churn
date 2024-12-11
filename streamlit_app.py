@@ -11,6 +11,8 @@ from pathlib import Path
 # Path of the trained model and data
 MODEL_PATH = "model/catboost_model.cbm" 
 DATA_PATH = "data/catboost_data.csv"
+SCALER_PATH = "model/scaler.pkl"
+
 
 st.set_page_config(page_title="Churn Project")
 
@@ -31,6 +33,10 @@ def load_model():
 
 def yes_no_to_binary(value):
     return 1 if value == "Yes" else 0
+
+def load_scaler():
+    scaler = joblib.load(SCALER_PATH)
+    return scaler
 
 def calculate_shap(model, X_train, X_test):
     # Calculate SHAP values
@@ -164,7 +170,12 @@ def main():
                 "Monthly Charges": [monthly_charges],
                 "Total Charges": [total_charges]
             })
-
+            
+            # Transform numeric features using the scaler
+            numeric_features = ["TenureMonths", "MonthlyCharges", "TotalCharges"]
+            scaler = load_scaler()
+            new_customer_data[numeric_features] = scaler.transform(new_customer_data[numeric_features])
+            
             # Predict churn probability using the model
             churn_probability = model.predict_proba(new_customer_data)[:, 1]
 
