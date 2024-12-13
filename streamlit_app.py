@@ -109,9 +109,12 @@ def main():
         # Customer ID text input
         customer_id = st.selectbox("Choose the Customer", available_customer_ids)
         customer_index = X_test[X_test['CustomerID'] == customer_id].index[0]
-        st.write(f'Customer {customer_id}: Actual value for the Customer Churn : {y_test.iloc[customer_index]}')
+        st.write(f'Customer {customer_id}:')
+        st.write(f'Actual value for the Customer Churn : {y_test.iloc[customer_index]}')
         y_pred = model.predict(X_test)
-        st.write(f"Customer {customer_id}: CatBoost Model's prediction for the Customer Churn : {y_pred[customer_index]}")
+        y_pred_prob = model.predict_proba(X_test)[:, 1]
+        st.write(f"Prediction for the Customer Churn Probability : {y_pred_prob[customer_index] * 100:.2f}%")
+        st.write(f"Prediction for the Customer Churn : {y_pred[customer_index]}")
         plot_shap(model, data, customer_id, X_train=X_train, X_test=X_test)
     
     # If Feature Importance is selected
