@@ -38,24 +38,25 @@ def load_scaler():
     scaler = joblib.load(SCALER_PATH)
     return scaler
 
-def calculate_shap(model, X_train, X_test):
+@st.cache_resource
+def calculate_shap(_model, X_train, X_test):
     # Calculate SHAP values
-    explainer = shap.TreeExplainer(model)
-    shap_values_cat_train = explainer.shap_values(X_train)
-    shap_values_cat_test = explainer.shap_values(X_test)
-    return explainer, shap_values_cat_train, shap_values_cat_test
+    explainer = shap.TreeExplainer(_model)
+    shap_train = explainer.shap_values(X_train)
+    shap_test = explainer.shap_values(X_test)
+    return explainer, shap_train, shap_test
 
-def plot_shap_values(model, explainer, shap_values_cat_train, shap_values_cat_test, customer_id, X_test, X_train):
+def plot_shap_values(model, explainer, shap_train, shap_test, customer_id, X_test, X_train):
     # Visualize SHAP values for a specific customer
     customer_index = X_test[X_test['CustomerID'] == customer_id].index[0]
     fig, ax_2 = plt.subplots(figsize=(6,6), dpi=200)
-    shap.decision_plot(explainer.expected_value, shap_values_cat_test[customer_index], X_test[X_test['CustomerID'] == customer_id], link="logit")
+    shap.decision_plot(explainer.expected_value, shap_test[customer_index], X_test[X_test['CustomerID'] == customer_id], link="logit")
     st.pyplot(fig)
     plt.close()
 
-def display_shap_summary(shap_values_cat_train, X_train):
+def display_shap_summary(shap_train, X_train):
     # Create the plot summarizing the SHAP values
-    shap.summary_plot(shap_values_cat_train, X_train, plot_type="bar", plot_size=(12,12))
+    shap.summary_plot(shap_train, X_train, plot_type="bar", plot_size=(12,12))
     summary_fig, _ = plt.gcf(), plt.gca()
     st.pyplot(summary_fig)
     plt.close()
@@ -67,23 +68,14 @@ def display_shap_waterfall_plot(explainer, expected_value, shap_values, feature_
     st.pyplot(fig)
     plt.close()
 
-def summary(model, data, X_train, X_test):
-    # Calculate SHAP values
-    explainer, shap_values_cat_train, shap_values_cat_test = calculate_shap(model, X_train, X_test)
+def plot_shap(model, data, customer_id, X_train, X_test, explainer, shap_train, shap_test):
 
-    # Summarize and visualize SHAP values
-    display_shap_summary(shap_values_cat_train, X_train)
-
-def plot_shap(model, data, customer_id, X_train, X_test):
-    # Calculate SHAP values
-    explainer, shap_values_cat_train, shap_values_cat_test = calculate_shap(model, X_train, X_test)
-    
     # Visualize SHAP values
-    plot_shap_values(model, explainer, shap_values_cat_train, shap_values_cat_test, customer_id, X_test, X_train)
+    plot_shap_values(model, explainer, shap_train, shap_test, customer_id, X_test, X_train)
 
     # Waterfall
     customer_index = X_test[X_test['CustomerID'] == customer_id].index[0]
-    display_shap_waterfall_plot(explainer, explainer.expected_value, shap_values_cat_test[customer_index], feature_names=X_test.columns, max_display=20)
+    display_shap_waterfall_plot(explainer, explainer.expected_value, shap_test[customer_index], feature_names=X_test.columns, max_display=20)
 
 st.title("Telco Customer Churn Project")
 
@@ -100,6 +92,8 @@ def main():
     max_monthly_charges = data['Monthly Charges'].max()
     max_total_charges = data['Total Charges'].max()
 
+    explainer, shap_train, shap_test = calculate_shap(_model = model, X_train = X_train, X_test = X_test)
+
     # Radio buttons for options
     election = st.radio("Make Your Choice:", ("Feature Importance", "User-based SHAP", "Calculate the probability of CHURN"))
     available_customer_ids = X_test['CustomerID'].tolist()
@@ -115,11 +109,11 @@ def main():
         y_pred_prob = model.predict_proba(X_test)[:, 1]
         st.write(f"Prediction for the Customer Churn Probability : {y_pred_prob[customer_index] * 100:.2f}%")
         st.write(f"Prediction for the Customer Churn : {y_pred[customer_index]}")
-        plot_shap(model, data, customer_id, X_train=X_train, X_test=X_test)
+        plot_shap(model, data, customer_id, X_train=X_train, X_test=X_test, explainer = explainer, shap_train = shap_train, shap_test = shap_test)
     
     # If Feature Importance is selected
     elif election == "Feature Importance":
-        summary(model, data, X_train=X_train, X_test=X_test)
+        display_shap_summary(shap_train= shap_train, X_train=X_train)
 
     # If Calculate CHURN Probability option is selected
     elif election == "Calculate the probability of CHURN":
