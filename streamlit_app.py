@@ -95,11 +95,11 @@ def main():
     explainer, shap_train, shap_test = calculate_shap(_model = model, X_train = X_train, X_test = X_test)
 
     # Radio buttons for options
-    election = st.radio("Make Your Choice:", ("Feature Importance", "User-based SHAP", "Calculate the probability of CHURN"))
+    election = st.radio("Make Your Choice:", ("Feature Importance", "Current customer & user-based SHAP", "Future customer prediction"))
     available_customer_ids = X_test['CustomerID'].tolist()
     
     # If User-based SHAP option is selected
-    if election == "User-based SHAP":
+    if election == "Current customer & user-based SHAP":
         # Customer ID text input
         customer_id = st.selectbox("Choose the Customer", available_customer_ids)
         customer_index = X_test[X_test['CustomerID'] == customer_id].index[0]
@@ -116,7 +116,7 @@ def main():
         display_shap_summary(shap_train= shap_train, X_train=X_train)
 
     # If Calculate CHURN Probability option is selected
-    elif election == "Calculate the probability of CHURN":
+    elif election == "Future customer prediction":
         # Retrieving data from the user
         customerID = "6464-UIAEA"
         gender = st.selectbox("Gender:", ("Female", "Male"))
