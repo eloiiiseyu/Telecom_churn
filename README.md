@@ -1,4 +1,4 @@
-# 🎈 Telecom Churn Prediction Web Page
+# 🎈 Telecom Customer Churn Prediction 
 
 Please visit the link below to explore the project!
 
