@@ -1,19 +1,7 @@
-# 🎈 Blank app template
+# 🎈 Telecom Churn Prediction Web Page
 
-A simple Streamlit app template for you to modify!
+Please visit the link below to explore the project!
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+[![Open in Streamlit]([https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/](https://telecom-churn-590xwb6ti5g.streamlit.app/))
 
-### How to run it on your own machine
-
-1. Install the requirements
-
-   ```
-   $ pip install -r requirements.txt
-   ```
-
-2. Run the app
-
-   ```
-   $ streamlit run streamlit_app.py
-   ```
+   
